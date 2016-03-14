@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\Home\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.0\support-annotations-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
+        <dex dex="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\pre-dexed\debug\support-annotations-23.1.0_d101511d00ca44c88da131465a1b800858bfa487.jar" />
+    </item>
+    <item
+        jar="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\pre-dexed\debug\internal_impl-23.1.0_74fcf0b4d6375ce1a143320a99051f2a7ef72dde.jar" />
+    </item>
+    <item
+        jar="C:\Users\Home\.gradle\caches\modules-2\files-2.1\org.androidannotations\androidannotations-api\3.3.2\7d6149d856b880bbd676047aacb8446a758fbbdb\androidannotations-api-3.3.2.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="7d6149d856b880bbd676047aacb8446a758fbbdb">
+        <dex dex="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\pre-dexed\debug\androidannotations-api-3.3.2_63189c0cf879ee84c53325afe427d1ab1b0b87ba.jar" />
+    </item>
+    <item
+        jar="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.1.0_e9d109d706b00134137148c0a29c2f1759293eae.jar" />
+    </item>
+    <item
+        jar="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="57ae0d750ff83f0c738d21720224ac7ea866a094">
+        <dex dex="C:\Users\Home\Desktop\Zapisky\CheckMyWifi\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.1.0_4c12c3d5f057fd33d3c50d1e6ff6ecc08fe70e28.jar" />
+    </item>
+
+</items>

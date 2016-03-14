@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1F2835">
+
+    <ImageView
+        android:id="@+id/imageLogo"
+        android:layout_width="210dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/logo"
+        android:layout_alignEnd="@+id/progressBar"
+        android:layout_marginRight="50dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
+        android:indeterminate="false"
+        android:progressDrawable="@drawable/circular_progress_bar"
+        android:background="@drawable/circle_shape"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="100"
+        android:progress="65"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp" />
+
+    <Button
+        android:id="@+id/buttonStopScanning"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:background="#1F2835"
+        android:text="stop scanning"
+        android:textColor="#999999"
+        android:layout_above="@+id/progressBar"
+        android:layout_alignStart="@+id/imageLogo"
+        android:layout_marginLeft="95dp" />
+
+    <TextView
+        android:id="@+id/textRouter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:fontFamily="Lato"
+        android:text="Router name"
+        android:textColor="#999999"
+        android:textIsSelectable="false"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/textDefault"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageLogo"
+        android:layout_alignStart="@+id/imageLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:fontFamily="Lato Medium"
+        android:text="Default settings"
+        android:textColor="#999999"
+        android:textSize="20dp"
+        android:layout_marginLeft="80dp" />
+
+    <TextView
+        android:id="@+id/textFirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/imageLogo"
+        android:layout_below="@+id/imageLogo"
+        android:layout_marginTop="125dp"
+        android:fontFamily="Lato Medium"
+        android:text="Firmware version"
+        android:textColor="#999999"
+        android:textSize="20dp"
+        android:layout_marginLeft="80dp" />
+
+    <TextView
+        android:id="@+id/textEncrypt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/textFirm"
+        android:layout_below="@+id/textFirm"
+        android:layout_marginTop="20dp"
+        android:fontFamily="Lato Medium"
+        android:text="Encryption protocol"
+        android:textColor="#999999"
+        android:textSize="20dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBarDefault"
+        style="@style/GenericProgressIndicator"
+        android:layout_alignStart="@+id/imageLogo"
+        android:indeterminate="false"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="154dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBarFirmVersion"
+        style="@style/GenericProgressIndicator"
+        android:layout_alignStart="@+id/imageLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textEncrypt"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="50dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBarEncryption"
+        style="@style/GenericProgressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/imageLogo"
+        android:layout_marginTop="247dp"
+        android:layout_marginLeft="50dp" />
+
+    <TextView
+        android:id="@+id/textPercentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="Lato Medium"
+        android:text="60 %"
+        android:textColor="#999999"
+        android:textSize="50dp"
+        android:layout_marginBottom="80dp"
+        android:layout_alignBottom="@+id/progressBar"
+        android:layout_alignEnd="@+id/imageLogo"
+        android:layout_marginRight="0dp" />
+
+</RelativeLayout>
