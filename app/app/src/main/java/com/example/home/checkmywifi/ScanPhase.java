@@ -1,6 +1,10 @@
 package com.example.home.checkmywifi;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -85,17 +89,52 @@ public class ScanPhase extends AppCompatActivity {
     public void connectToRouter() {
         MyBackgroundTask m = new MyBackgroundTask();
         m.connectToRouter();
-        updateUi(m.getRouterName());
+        Log.w("YOLO", m.getFirmVersion());
+        updateUi(m.getRouterName(), m.getFirmVersion());
 
+       /* WifiManager mainWifiObj;
+        mainWifiObj = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        WifiManager wifiManager = (WifiManager) getSystemService (Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo ();
+
+        Log.w("WIFI", mainWifiObj.getConnectionInfo().toString());
+        Log.w("WIFI", info.getSSID().toString());
+
+        if( info != null )
+        {
+            WifiConfiguration activeConfig = null;
+            for( WifiConfiguration conn : wifiManager.getConfiguredNetworks() )
+            {
+                if( conn.status == WifiConfiguration.Status.CURRENT )
+                {
+                    activeConfig = conn;
+                    break;
+                }
+            }
+            if( activeConfig != null )
+            {
+                Log.w("CONFIG", activeConfig.toString());
+            }
+        }*/
     }
 
     @UiThread
-    protected void updateUi(String result){
-        routerName.setText(result);
+    protected void updateUi(String router, String firm){
+        routerName.setText(router);
         progressBarDefault.setVisibility(View.GONE);
         textDefault.setTextColor(Color.parseColor("#CC2733"));
 
         for(int i = 0; i < 34; i++){
+            progressBar.setProgress(i);
+            percentage.setText(i + " %");
+        }
+
+        textFirm.setText("Firmware " + firm);
+        progressBarFirm.setVisibility(View.GONE);
+        textFirm.setTextColor(Color.parseColor("#D8D444"));
+
+        for(int i = 34; i < 67; i++){
             progressBar.setProgress(i);
             percentage.setText(i + " %");
         }
