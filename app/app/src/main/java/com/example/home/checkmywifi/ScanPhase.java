@@ -1,6 +1,8 @@
 package com.example.home.checkmywifi;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -41,6 +43,9 @@ import java.util.TimerTask;
  */
 @EActivity(R.layout.scanning_phase)
 public class ScanPhase extends AppCompatActivity {
+    private String name = "";
+    private String pass = "";
+    private boolean loggedByLogin = false;
 
     @ViewById(R.id.imageLogo)
     ImageView imageLogo;
@@ -88,7 +93,16 @@ public class ScanPhase extends AppCompatActivity {
     @Background
     public void connectToRouter() {
         MyBackgroundTask m = new MyBackgroundTask();
-        m.connectToRouter();
+
+        if(!m.connectToRouter() && !loggedByLogin){
+            loggedByLogin = true;
+            Intent in = new Intent(this, Login_.class);
+            startActivityForResult(in, 1);
+        }
+
+        Log.w("PASS", pass);
+        m.loginToRouter(name, pass);
+
         Log.w("YOLO", m.getFirmVersion());
         updateUi(m.getRouterName(), m.getFirmVersion());
 
@@ -122,8 +136,13 @@ public class ScanPhase extends AppCompatActivity {
     @UiThread
     protected void updateUi(String router, String firm){
         routerName.setText(router);
+
         progressBarDefault.setVisibility(View.GONE);
-        textDefault.setTextColor(Color.parseColor("#CC2733"));
+        if(loggedByLogin) {
+            textDefault.setTextColor(Color.parseColor("#76BC3F"));
+        } else {
+            textDefault.setTextColor(Color.parseColor("#CC2733"));
+        }
 
         for(int i = 0; i < 34; i++){
             progressBar.setProgress(i);
@@ -149,6 +168,23 @@ public class ScanPhase extends AppCompatActivity {
     public void buttonStopScanning() {
         Start_.intent(this)
                 .start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                name = data.getStringExtra("name");
+                pass = data.getStringExtra("pass");
+
+                Log.w("Name", name);
+                Log.w("PASS", pass);
+                connectToRouter();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
     }
 
 }
