@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1F2835"
+    tools:context="com.example.home.checkmyrouter.SplashScreen">
+
+    <ImageView
+        android:id="@+id/imageLogo"
+        android:layout_width="210dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="40dp"
+        android:background="@drawable/logo"
+        android:layout_marginTop="232dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>
