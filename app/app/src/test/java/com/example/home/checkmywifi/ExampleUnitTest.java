@@ -1,4 +1,4 @@
-package com.example.home.checkmywifi;
+package com.example.home.checkmyrouter;
 
 import org.junit.Test;
 

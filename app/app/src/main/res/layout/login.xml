@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1F2835"
-    tools:context="com.example.home.checkmywifi.Start">
+    tools:context=".old.Start">
 
     <ImageButton
         android:id="@+id/buttonToScan"
