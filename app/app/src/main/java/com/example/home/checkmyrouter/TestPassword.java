@@ -1,9 +1,12 @@
 package com.example.home.checkmyrouter;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.Log;
@@ -32,28 +35,9 @@ public class TestPassword implements TestManager {
 
     @Override
     public void test() {
-        Log.w("Before Credentials", "✓");
-        this.getCredentials();
-        Log.w("TestPass service before", "✓");
-        for (int i = 0; i < name.size(); i++) {
-            try {
-                HttpURLConnection c = (HttpURLConnection) new URL("http://192.168.1.1").openConnection();
-
-                c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
-                if (c.getResponseMessage().equals("Unauthorized")) {
-                    c.disconnect();
-                } else {
-                    Log.w("TestPass", c.getResponseMessage());
-
-                    Log.w("Autentizacia", "✓");
-
-                    isDefault = true;
-                    break;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Log.w("Router", getRouterIp());
+        Log.w("PASStest", "✓");
+        connectToRouter();
     }
 
     @Override
@@ -72,7 +56,8 @@ public class TestPassword implements TestManager {
     private String getRouterIp(){
         final WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         final DhcpInfo dhcp = manager.getDhcpInfo();
-        return Formatter.formatIpAddress(dhcp.gateway);
+        String result = Formatter.formatIpAddress(dhcp.gateway);
+        return result.equals("0.0.0.0") ? "192.168.1.1" : result;
     }
 
     private String getB64Auth (String login, String pass) {
@@ -102,5 +87,41 @@ public class TestPassword implements TestManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean connectToRouter() {
+        Log.w("Before Credentials", "✓");
+        this.getCredentials();
+        Log.w("TestPass service before", "✓");
+
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < name.size(); i++) {
+                    try {
+                        HttpURLConnection c = (HttpURLConnection) new URL("http://192.168.1.1").openConnection();
+
+                        c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
+                        if (c.getResponseMessage().equals("Unauthorized")) {
+                            c.disconnect();
+                        } else {
+                            Log.w("TestPass", c.getResponseMessage());
+
+                            Log.w("Autentizacia", "✓");
+
+                            isDefault = true;
+                            break;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        Thread testPass = new Thread(r);
+        testPass.start();
+        return isDefault;
     }
 }
