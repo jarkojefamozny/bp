@@ -36,16 +36,29 @@ public class BindingActivity extends Activity {
         super.onStart();
         // Bind to LocalService
         Log.w("ONSTART", "✓");
-        /*if(ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {*/
-            Intent intent = new Intent(this, ScanService.class);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);/*
+        if(ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                startScan();
         } else {
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
                 Toast.makeText(this, "Access fine location required to access your wifi", Toast.LENGTH_SHORT).show();
             }
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_RESULT);
-        }*/
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_RESULT);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[]permissions, int [] grantResults){
+        if(requestCode == ACCESS_FINE_LOCATION_RESULT) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startScan();
+            } else {
+                Toast.makeText(this,
+                        "Access fine location was not granted, app can not run", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override
@@ -76,4 +89,9 @@ public class BindingActivity extends Activity {
             mBound = false;
         }
     };
+
+    private void startScan(){
+        Intent intent = new Intent(this, ScanService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
 }

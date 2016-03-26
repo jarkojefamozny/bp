@@ -35,11 +35,11 @@ public class ScanService extends Service implements ServiceManager {
         Log.w("SCAN SERVICE - RUN", "✓");
         TestPassword.context = this;
         passwordTest.test();
-        Log.w("SCAN SERVICE", String.valueOf(passwordTest.testPassed()));
+        Log.w("PASSWORD TEST", String.valueOf(passwordTest.testPassed()));
 
         TestEncryption.context = this;
         encryptionTest.test();
-        Log.w("SCAN SERVICE", String.valueOf(encryptionTest.testPassed()));
+        Log.w("ENRCRYPT TEST", String.valueOf(encryptionTest.testPassed()));
     }
 
     @Override

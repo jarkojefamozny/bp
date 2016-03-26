@@ -31,18 +31,22 @@ public class TestPassword implements TestManager {
 
     public static ScanService context = null;
 
-    private boolean isDefault = false;
+    private boolean testPassed = false;
 
     @Override
     public void test() {
-        Log.w("Router", getRouterIp());
-        Log.w("PASStest", "✓");
+      //  Log.w("Router", getRouterIp());
+       // Log.w("PASStest", "✓");
         connectToRouter();
     }
 
     @Override
     public boolean testPassed() {
-        return !isDefault;
+        return testPassed;
+    }
+
+    public void setTestPassed(boolean testPassed) {
+        this.testPassed = testPassed;
     }
 
     @Override
@@ -76,23 +80,23 @@ public class TestPassword implements TestManager {
             String line;
             while((line = in.readLine()) != null)
             {
-                Log.w("Reading", "✓ " + line);
+               // Log.w("Reading", "✓ " + line);
                 String parts[] = {"", ""};
                 parts = line.split(":", -1);
-                Log.w("Parts", "✓ " + "[" + parts[0] + "]" + "[" + parts[1] + "]");
+               // Log.w("Parts", "✓ " + "[" + parts[0] + "]" + "[" + parts[1] + "]");
                 name.add(parts[0]);
                 pass.add(parts[1]);
             }
-            Log.w("Reading finished", "✓");
+            //Log.w("Reading finished", "✓");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private boolean connectToRouter() {
-        Log.w("Before Credentials", "✓");
+        //Log.w("Before Credentials", "✓");
         this.getCredentials();
-        Log.w("TestPass service before", "✓");
+       // Log.w("TestPass service before", "✓");
 
 
         Runnable r = new Runnable() {
@@ -106,11 +110,11 @@ public class TestPassword implements TestManager {
                         if (c.getResponseMessage().equals("Unauthorized")) {
                             c.disconnect();
                         } else {
-                            Log.w("TestPass", c.getResponseMessage());
+                          //  Log.w("TestPass", c.getResponseMessage());
 
-                            Log.w("Autentizacia", "✓");
+                          //  Log.w("Autentizacia", "✓");
 
-                            isDefault = true;
+                            setTestPassed(false);
                             break;
                         }
                     } catch (IOException e) {
@@ -122,6 +126,6 @@ public class TestPassword implements TestManager {
 
         Thread testPass = new Thread(r);
         testPass.start();
-        return isDefault;
+        return testPassed();
     }
 }

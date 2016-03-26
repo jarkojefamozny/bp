@@ -12,29 +12,32 @@ import java.util.List;
  * Created by Home on 23.03.2016.
  */
 public class TestEncryption implements TestManager {
-    private boolean isOk = false;
+    private boolean testPassed = false;
     public static ScanService context = null;
 
     @Override
     public void test() {
-        Log.w("SCAN SERVICE", "SOM TU?");
-        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        ScanResult network = (ScanResult) wifi.getScanResults();
-        String Capabilities =  network.capabilities;
+        List<ScanResult> networkList = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE)).getScanResults();
+        for (ScanResult network : networkList)
+        {
+            //Log.w("ENRYPTION TEST", network.capabilities);
+            String Capabilities = network.capabilities;
+            if(Capabilities.contains("WPA"))
+            {
+                testPassed = true;
+            }
+            else if(Capabilities.contains("WEP"))
+            {
+                testPassed = false;
+            }
+        }
 
-        if(Capabilities.contains("WPA"))
-        {
-            isOk = true;
-        }
-        else if(Capabilities.contains("WEP"))
-        {
-            isOk = false;
-        }
+
     }
 
     @Override
     public boolean testPassed() {
-        return isOk;
+        return testPassed;
     }
 
     @Override
