@@ -7,6 +7,12 @@ package com.example.home.checkmyrouter;
  */
 public interface TestManager {
     /**
+     * Method to get name of given test
+     *
+     * @return name of the test
+     */
+    public String testName();
+    /**
      * Method to test network by some interface implementing criteria.
      * In this method private attribute will be set
      */

@@ -11,9 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
 
-import com.example.home.checkmyrouter.old.Login_;
 import com.example.home.checkmyrouter.R;
-import com.example.home.checkmyrouter.old.Start_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;

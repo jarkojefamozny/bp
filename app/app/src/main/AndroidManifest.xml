@@ -31,6 +31,10 @@
             android:name="com.example.home.checkmyrouter.BindingActivity"
             android:label="CheckMyRouter" >
         </activity>
+        <activity
+            android:name="com.example.home.checkmyrouter.StateNoWifi"
+            android:label="CheckMyRouter" >
+        </activity>
         <service android:name="ScanService" />
     </application>
 

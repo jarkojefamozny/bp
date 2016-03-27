@@ -16,6 +16,11 @@ public class TestEncryption implements TestManager {
     public static ScanService context = null;
 
     @Override
+    public String testName() {
+        return "Encryption test";
+    }
+
+    @Override
     public void test() {
         List<ScanResult> networkList = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE)).getScanResults();
         for (ScanResult network : networkList)

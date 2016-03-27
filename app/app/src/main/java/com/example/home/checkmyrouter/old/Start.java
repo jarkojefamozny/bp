@@ -7,8 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.home.checkmyrouter.R;
-import com.example.home.checkmyrouter.old.ScanPhase_;
-
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;

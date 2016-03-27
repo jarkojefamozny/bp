@@ -34,7 +34,8 @@
         android:layout_marginBottom="30dp"
         android:background="#1F2835"
         android:scaleType="fitXY"
-        android:src="@drawable/no_wifi" />
+        android:src="@drawable/no_wifi"
+        android:onClick="onClick" />
 
     <TextView
 
@@ -43,10 +44,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textNoWifi"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="50dp"
         android:fontFamily="Lato Medium"
-        android:text="Please check your network connection and try again."
+        android:text="Please check your network connection!"
         android:textColor="#999999"
         android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="Lato Medium"
+        android:layout_below="@+id/textNoWifi"
+        android:layout_marginTop="80dp"
+        android:text="After connection is established click the button."
+        android:textColor="#999999"
+        android:textSize="15dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="false" />
 
 </RelativeLayout>

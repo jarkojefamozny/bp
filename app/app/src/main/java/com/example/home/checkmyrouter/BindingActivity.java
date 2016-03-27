@@ -2,11 +2,15 @@ package com.example.home.checkmyrouter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
@@ -15,12 +19,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.home.checkmyrouter.StateNoWifi;
+
 /**
  * Created by Home on 24.03.2016.
  */
 public class BindingActivity extends Activity {
     private ScanService mService;
     private boolean mBound = false;
+    private BroadcastReceiver receiver;
+    private IntentFilter intentFilter;
 
     private static final int ACCESS_FINE_LOCATION_RESULT = 1;
 
@@ -29,6 +37,30 @@ public class BindingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scanning_phase);
 
+         receiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                Bundle extras = intent.getExtras();
+
+                NetworkInfo info = (NetworkInfo) extras
+                        .getParcelable("networkInfo");
+
+                NetworkInfo.State state = info.getState();
+                Log.d("TEST Internet", info.toString() + " "
+                        + state.toString());
+
+                if (!(state == NetworkInfo.State.CONNECTED)|| !(info.getType() == ConnectivityManager.TYPE_WIFI)) {
+                    Intent i = new Intent(BindingActivity.this, StateNoWifi.class);
+                    startActivity(i);
+                }
+            }
+        };
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver((BroadcastReceiver) receiver, intentFilter);
     }
 
     @Override
@@ -36,6 +68,7 @@ public class BindingActivity extends Activity {
         super.onStart();
         // Bind to LocalService
         Log.w("ONSTART", "✓");
+
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 startScan();
@@ -55,6 +88,8 @@ public class BindingActivity extends Activity {
             } else {
                 Toast.makeText(this,
                         "Access fine location was not granted, app can not run", Toast.LENGTH_SHORT).show();
+                finish();
+                System.exit(0);
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -69,6 +104,24 @@ public class BindingActivity extends Activity {
             unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     /** Defines callbacks for service binding, passed to bindService() */

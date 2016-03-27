@@ -34,6 +34,11 @@ public class TestPassword implements TestManager {
     private boolean testPassed = false;
 
     @Override
+    public String testName() {
+        return "Default password test";
+    }
+
+    @Override
     public void test() {
       //  Log.w("Router", getRouterIp());
        // Log.w("PASStest", "✓");
@@ -61,6 +66,7 @@ public class TestPassword implements TestManager {
         final WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         final DhcpInfo dhcp = manager.getDhcpInfo();
         String result = Formatter.formatIpAddress(dhcp.gateway);
+        Log.w("GET ROUTER IP", result);
         return result.equals("0.0.0.0") ? "192.168.1.1" : result;
     }
 
@@ -94,26 +100,19 @@ public class TestPassword implements TestManager {
     }
 
     private boolean connectToRouter() {
-        //Log.w("Before Credentials", "✓");
         this.getCredentials();
-       // Log.w("TestPass service before", "✓");
-
 
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < name.size(); i++) {
                     try {
-                        HttpURLConnection c = (HttpURLConnection) new URL("http://192.168.1.1").openConnection();
+                        HttpURLConnection c = (HttpURLConnection) new URL("http://"+ getRouterIp()).openConnection();
 
                         c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
                         if (c.getResponseMessage().equals("Unauthorized")) {
                             c.disconnect();
                         } else {
-                          //  Log.w("TestPass", c.getResponseMessage());
-
-                          //  Log.w("Autentizacia", "✓");
-
                             setTestPassed(false);
                             break;
                         }
