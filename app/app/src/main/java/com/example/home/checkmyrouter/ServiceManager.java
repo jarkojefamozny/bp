@@ -1,5 +1,7 @@
 package com.example.home.checkmyrouter;
 
+import android.content.ServiceConnection;
+
 /**
  * Interface for services, like scan, fix, ...
  *
@@ -17,4 +19,6 @@ public interface ServiceManager {
      * @return true if all service passed, false if not
      */
     public boolean getResult();
+
+    public void setbContext(BindingActivity context);
 }

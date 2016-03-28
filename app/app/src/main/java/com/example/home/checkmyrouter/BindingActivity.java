@@ -17,18 +17,23 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.home.checkmyrouter.StateNoWifi;
 
 /**
  * Created by Home on 24.03.2016.
  */
 public class BindingActivity extends Activity {
-    private ScanService mService;
+    private ServiceManager mService;
     private boolean mBound = false;
     private BroadcastReceiver receiver;
     private IntentFilter intentFilter;
+    private BindingActivity bContext = this;
+
+    protected TextView percentage;
+    protected ProgressBar progressBar;
 
     private static final int ACCESS_FINE_LOCATION_RESULT = 1;
 
@@ -37,19 +42,18 @@ public class BindingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scanning_phase);
 
-         receiver = new BroadcastReceiver() {
+        percentage = (TextView) findViewById(R.id.textPercentage);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        receiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
 
                 Bundle extras = intent.getExtras();
 
-                NetworkInfo info = (NetworkInfo) extras
-                        .getParcelable("networkInfo");
-
+                NetworkInfo info = (NetworkInfo) extras.getParcelable("networkInfo");
                 NetworkInfo.State state = info.getState();
-                Log.d("TEST Internet", info.toString() + " "
-                        + state.toString());
 
                 if (!(state == NetworkInfo.State.CONNECTED)|| !(info.getType() == ConnectivityManager.TYPE_WIFI)) {
                     Intent i = new Intent(BindingActivity.this, StateNoWifi.class);
@@ -67,7 +71,7 @@ public class BindingActivity extends Activity {
     protected void onStart() {
         super.onStart();
         // Bind to LocalService
-        Log.w("ONSTART", "✓");
+        //Log.w("ONSTART", "✓");
 
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -130,9 +134,11 @@ public class BindingActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            Log.w("SERVICECONNECTED", "✓");
+            //Log.w("SERVICECONNECTED", "✓");
             ScanService.LocalBinder binder = (ScanService.LocalBinder) service;
+            //Log.w("BINDING", this.toString());
             mService = binder.getService();
+            mService.setbContext(bContext);
             mService.run();
             mBound = true;
         }

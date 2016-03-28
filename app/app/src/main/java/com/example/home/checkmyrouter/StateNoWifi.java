@@ -19,7 +19,6 @@ public class StateNoWifi extends Activity {
     }
 
     public void onClick(View v) {
-        Log.w("NOWIFI", "BUTOT");
         Intent i = new Intent(StateNoWifi.this, BindingActivity.class);
         startActivity(i);
     }

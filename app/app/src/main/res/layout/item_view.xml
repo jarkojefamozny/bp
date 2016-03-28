@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/item_testName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:fontFamily="Lato Medium"
+        android:text="Default settings"
+        android:textColor="#999999"
+        android:textSize="20dp" />
+
+    <ProgressBar
+        android:id="@+id/item_testProgressBar"
+        style="@style/GenericProgressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/item_testName"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_toStartOf="@+id/item_testName"
+        android:indeterminate="false" />
+</RelativeLayout>

@@ -2,7 +2,6 @@ package com.example.home.checkmyrouter;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public class TestEncryption implements TestManager {
     private boolean testPassed = false;
-    public static ScanService context = null;
+    public static ScanService sContext = null;
 
     @Override
     public String testName() {
@@ -22,7 +21,7 @@ public class TestEncryption implements TestManager {
 
     @Override
     public void test() {
-        List<ScanResult> networkList = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE)).getScanResults();
+        List<ScanResult> networkList = ((WifiManager) sContext.getSystemService(Context.WIFI_SERVICE)).getScanResults();
         for (ScanResult network : networkList)
         {
             //Log.w("ENRYPTION TEST", network.capabilities);

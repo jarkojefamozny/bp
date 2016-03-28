@@ -6,21 +6,23 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogRecord;
 
 /**
  * Created by Home on 23.03.2016.
@@ -28,9 +30,16 @@ import java.util.List;
 public class TestPassword implements TestManager {
     private List<String> name;
     private List<String> pass;
+    private double actualPercentage;
 
-    public static ScanService context = null;
+    private static final int NUMBER_OF_TESTS = 2;
 
+    Handler handler = new Handler();
+
+    protected static ScanService sContext;
+    protected static BindingActivity bContext;
+
+    private boolean defaultTest = false;
     private boolean testPassed = false;
 
     @Override
@@ -40,14 +49,20 @@ public class TestPassword implements TestManager {
 
     @Override
     public void test() {
-      //  Log.w("Router", getRouterIp());
-       // Log.w("PASStest", "✓");
         connectToRouter();
     }
 
     @Override
     public boolean testPassed() {
         return testPassed;
+    }
+
+    public boolean isDefaultTest() {
+        return defaultTest;
+    }
+
+    public void setDefaultTest(boolean defaultTest) {
+        this.defaultTest = defaultTest;
     }
 
     public void setTestPassed(boolean testPassed) {
@@ -63,7 +78,7 @@ public class TestPassword implements TestManager {
     }
 
     private String getRouterIp(){
-        final WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        final WifiManager manager = (WifiManager) sContext.getSystemService(Context.WIFI_SERVICE);
         final DhcpInfo dhcp = manager.getDhcpInfo();
         String result = Formatter.formatIpAddress(dhcp.gateway);
         Log.w("GET ROUTER IP", result);
@@ -80,7 +95,7 @@ public class TestPassword implements TestManager {
         name = new ArrayList<>();
         pass = new ArrayList<>();
 
-        AssetManager am = context.getAssets();
+        AssetManager am = sContext.getAssets();
         Log.w("getAssets", "✓");
         try (BufferedReader in = new BufferedReader(new InputStreamReader(am.open("credentials.txt")))){
             String line;
@@ -93,7 +108,6 @@ public class TestPassword implements TestManager {
                 name.add(parts[0]);
                 pass.add(parts[1]);
             }
-            //Log.w("Reading finished", "✓");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,24 +115,51 @@ public class TestPassword implements TestManager {
 
     private boolean connectToRouter() {
         this.getCredentials();
+        final String url = "http://"+ getRouterIp();
 
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < name.size(); i++) {
+                    if(testPassed()){
+                        break;
+                    }
+
                     try {
-                        HttpURLConnection c = (HttpURLConnection) new URL("http://"+ getRouterIp()).openConnection();
+                        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
 
                         c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
                         if (c.getResponseMessage().equals("Unauthorized")) {
                             c.disconnect();
                         } else {
                             setTestPassed(false);
-                            break;
+                            setDefaultTest(true);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    bContext.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            double temp = (double) 100 / NUMBER_OF_TESTS;
+                            double eps = (double) name.size() / temp;
+                            int tmp = (int) actualPercentage;
+                            actualPercentage += eps;
+                            if(temp > tmp) {
+                                actualPercentage += eps;
+                                tmp = (int) actualPercentage;
+                                bContext.percentage.setText(String.valueOf(tmp) + " %");
+
+                                bContext.progressBar.setProgress(tmp);
+                            }
+                        }
+                    });
                 }
             }
         };

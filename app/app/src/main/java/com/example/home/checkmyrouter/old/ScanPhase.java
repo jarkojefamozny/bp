@@ -53,15 +53,6 @@ public class ScanPhase extends AppCompatActivity {
     @ViewById(R.id.textPercentage)
     TextView percentage;
 
-    @ViewById(R.id.progressBarDefault)
-    ProgressBar progressBarDefault;
-
-    @ViewById(R.id.progressBarFirmVersion)
-    ProgressBar progressBarFirm;
-
-    @ViewById(R.id.progressBarEncryption)
-    ProgressBar progressBarEncrypt;
-
     @AfterViews
     public void setupPercentage(){
         percentage.setText("0 %");
@@ -86,7 +77,7 @@ public class ScanPhase extends AppCompatActivity {
         m.loginToRouter(name, pass);
 
         Log.w("YOLO", m.getFirmVersion());
-        updateUi(m.getRouterName(), m.getFirmVersion());
+        //updateUi(m.getRouterName(), m.getFirmVersion());
 
         /* mainWifiObj;
         mainWifiObj = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -114,7 +105,7 @@ public class ScanPhase extends AppCompatActivity {
             }
         }*/
     }
-
+/*
     @UiThread
     protected void updateUi(String router, String firm){
         routerName.setText(router);
@@ -140,7 +131,7 @@ public class ScanPhase extends AppCompatActivity {
             percentage.setText(i + " %");
         }
     }
-
+*/
     @AfterViews
     public void setRouterName(){
         connectToRouter();
