@@ -15,8 +15,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,14 +62,13 @@ public class BindingActivity extends Activity {
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver((BroadcastReceiver) receiver, intentFilter);
+        registerReceiver(receiver, intentFilter);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         // Bind to LocalService
-        //Log.w("ONSTART", "✓");
 
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -125,7 +122,6 @@ public class BindingActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(receiver);
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -134,9 +130,7 @@ public class BindingActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            //Log.w("SERVICECONNECTED", "✓");
             ScanService.LocalBinder binder = (ScanService.LocalBinder) service;
-            //Log.w("BINDING", this.toString());
             mService = binder.getService();
             mService.setbContext(bContext);
             mService.run();

@@ -2,6 +2,8 @@ package com.example.home.checkmyrouter;
 
 import android.content.ServiceConnection;
 
+import java.util.Map;
+
 /**
  * Interface for services, like scan, fix, ...
  *
@@ -16,9 +18,9 @@ public interface ServiceManager {
     /**
      * Method to collect results from our service
      *
-     * @return true if all service passed, false if not
+     * @return true if all s ervice passed, false if not
      */
-    public boolean getResult();
+    public Map getResults();
 
     public void setbContext(BindingActivity context);
 }

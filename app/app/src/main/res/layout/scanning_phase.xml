@@ -29,18 +29,6 @@
         android:progress="0"
         android:progressDrawable="@drawable/circular_progress_bar" />
 
-    <Button
-        android:id="@+id/buttonStopScanning"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_above="@+id/progressBar"
-        android:layout_alignStart="@+id/imageLogo"
-        android:layout_marginLeft="95dp"
-        android:background="#1F2835"
-        android:text="stop scanning"
-        android:textColor="#999999" />
-
     <TextView
         android:id="@+id/textPercentage"
         android:layout_width="wrap_content"
@@ -48,7 +36,7 @@
         android:layout_alignBottom="@+id/progressBar"
         android:layout_alignEnd="@+id/imageLogo"
         android:layout_marginBottom="80dp"
-        android:layout_marginRight="0dp"
+        android:layout_marginRight="-10dp"
         android:fontFamily="Lato Medium"
         android:text="0 %"
         android:textColor="#999999"
@@ -56,10 +44,13 @@
 
     <ListView
         android:id="@+id/testListView"
-        android:layout_width="wrap_content"
+        android:layout_width="350dp"
         android:layout_height="200dp"
         android:layout_below="@+id/imageLogo"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
-
+        android:layout_marginTop="20dp"
+        android:background="#293544"
+        android:fadeScrollbars="false"
+        android:scrollbarSize = "10dip"
+        android:dividerHeight="3dp"/>
 </RelativeLayout>

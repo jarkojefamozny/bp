@@ -35,9 +35,6 @@ public class ScanPhase extends AppCompatActivity {
     @ViewById(R.id.progressBar)
     ProgressBar progressBar;
 
-    @ViewById(R.id.buttonStopScanning)
-    Button stopButton;
-
     @ViewById(R.id.textRouter)
     TextView routerName;
 
@@ -137,11 +134,6 @@ public class ScanPhase extends AppCompatActivity {
         connectToRouter();
     }
 
-    @Click
-    public void buttonStopScanning() {
-        Start_.intent(this)
-                .start();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

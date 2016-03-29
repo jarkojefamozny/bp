@@ -30,9 +30,6 @@ import java.util.logging.LogRecord;
 public class TestPassword implements TestManager {
     private List<String> name;
     private List<String> pass;
-    private double actualPercentage;
-
-    private static final int NUMBER_OF_TESTS = 2;
 
     Handler handler = new Handler();
 
@@ -73,7 +70,7 @@ public class TestPassword implements TestManager {
     public String getSolution() {
         return "Launch web browser.\n" +
                "Log into your device through router\n" +
-               "IP address - default is 192.168.1.1 .\n" +
+               "IP address " + getRouterIp() + ".\n" +
                "Go to settings and set your password";
     }
 
@@ -101,10 +98,8 @@ public class TestPassword implements TestManager {
             String line;
             while((line = in.readLine()) != null)
             {
-               // Log.w("Reading", "✓ " + line);
                 String parts[] = {"", ""};
                 parts = line.split(":", -1);
-               // Log.w("Parts", "✓ " + "[" + parts[0] + "]" + "[" + parts[1] + "]");
                 name.add(parts[0]);
                 pass.add(parts[1]);
             }
@@ -124,7 +119,6 @@ public class TestPassword implements TestManager {
                     if(testPassed()){
                         break;
                     }
-
                     try {
                         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
 
@@ -138,28 +132,6 @@ public class TestPassword implements TestManager {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    bContext.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            double temp = (double) 100 / NUMBER_OF_TESTS;
-                            double eps = (double) name.size() / temp;
-                            int tmp = (int) actualPercentage;
-                            actualPercentage += eps;
-                            if(temp > tmp) {
-                                actualPercentage += eps;
-                                tmp = (int) actualPercentage;
-                                bContext.percentage.setText(String.valueOf(tmp) + " %");
-
-                                bContext.progressBar.setProgress(tmp);
-                            }
-                        }
-                    });
                 }
             }
         };

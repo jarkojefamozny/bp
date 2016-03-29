@@ -1,8 +1,10 @@
 package com.example.home.checkmyrouter;
 
 import android.content.Context;
+import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 import android.util.Log;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.List;
 public class TestEncryption implements TestManager {
     private boolean testPassed = false;
     public static ScanService sContext = null;
+    public static BindingActivity bContext = null;
+
 
     @Override
     public String testName() {
@@ -22,9 +26,9 @@ public class TestEncryption implements TestManager {
     @Override
     public void test() {
         List<ScanResult> networkList = ((WifiManager) sContext.getSystemService(Context.WIFI_SERVICE)).getScanResults();
+
         for (ScanResult network : networkList)
         {
-            //Log.w("ENRYPTION TEST", network.capabilities);
             String Capabilities = network.capabilities;
             if(Capabilities.contains("WPA"))
             {
@@ -35,8 +39,6 @@ public class TestEncryption implements TestManager {
                 testPassed = false;
             }
         }
-
-
     }
 
     @Override
@@ -48,9 +50,17 @@ public class TestEncryption implements TestManager {
     public String getSolution() {
         return  "Launch web browser.\n" +
                 "Log into your device through router\n" +
-                "IP address - default is 192.168.1.1 .\n" +
+                "IP address " + getRouterIp() + " .\n" +
                 "Go to settings and set your encryption to WPA2\n" +
                 "If there is no such an option, consider\n" +
                 "changing router.";
+    }
+
+    private String getRouterIp(){
+        final WifiManager manager = (WifiManager) sContext.getSystemService(Context.WIFI_SERVICE);
+        final DhcpInfo dhcp = manager.getDhcpInfo();
+        String result = Formatter.formatIpAddress(dhcp.gateway);
+        Log.w("GET ROUTER IP", result);
+        return result.equals("0.0.0.0") ? "192.168.1.1" : result;
     }
 }
