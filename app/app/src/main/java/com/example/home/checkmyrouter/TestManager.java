@@ -1,5 +1,7 @@
 package com.example.home.checkmyrouter;
 
+import android.os.Parcelable;
+
 /**
  * Interface for tests, like password, encryption, stack, ...
  *

@@ -7,6 +7,7 @@ import android.media.Image;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import junit.framework.Test;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +30,59 @@ import java.util.Map;
  * Created by Home on 23.03.2016.
  */
 public class ScanService extends Service implements ServiceManager {
+
+    public static final String BROADCAST_ACTION = "com.example.home.checkmyrouter";
+    private final Handler handler = new Handler();
+    Intent intent;
+
+    TestManager test;
+    int index;
+
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
-    protected BindingActivity bContext;
     private Map<TestManager, Boolean> results = new HashMap<>();
 
-    private List<TestManager> tests = new ArrayList<TestManager>();
     private double actual = 0;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        intent = new Intent(BROADCAST_ACTION);
+    }
+
+    @Override
+    public void run(TestManager test, int index) {
+        this.test = test;
+        this.index = index;
+
+        handler.removeCallbacks(sendUpdatesToUI);
+    }
+
+    private Runnable sendUpdatesToUI = new Runnable() {
+        public void run() {
+            /*tests.add(new TestPassword());
+            tests.add(new TestEncryption());
+            tests.add(new TestPassword());
+            tests.add(new TestEncryption());*/
+
+
+            TestPassword.sContext = ScanService.this;
+            TestEncryption.sContext = ScanService.this;
+
+            test.test();
+                //results.put(test, test.testPassed());
+                DisplayLoggingInfo(test, index);
+            }
+    };
+
+    private void DisplayLoggingInfo(TestManager test, int index) {
+        Log.d("DATA", "entered DisplayLoggingInfo");
+
+        intent.putExtra("test", (Parcelable) test);
+        intent.putExtra("index", String.valueOf(index));
+        sendBroadcast(intent);
+    }
 
     public class LocalBinder extends Binder {
         ScanService getService() {
@@ -45,16 +94,12 @@ public class ScanService extends Service implements ServiceManager {
     public ScanService() {
     }
 
-    public void setbContext(BindingActivity bContext) {
-        this.bContext = bContext;
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
-    @Override
+  /*  @Override
     public void run() {
         tests.add(new TestPassword());
         tests.add(new TestEncryption());
@@ -63,8 +108,6 @@ public class ScanService extends Service implements ServiceManager {
 
         setListView();
         TestPassword.sContext = this;
-        TestPassword.bContext = bContext;
-        TestEncryption.bContext = bContext;
         TestEncryption.sContext = this;
 
         int index = 0;
@@ -79,6 +122,7 @@ public class ScanService extends Service implements ServiceManager {
 
         registerClickCallback();
     }
+    */
 /*
     private void updateListView(int index, boolean passed) {
         final ListView list = (ListView) bContext.findViewById(R.id.testListView);
@@ -100,7 +144,7 @@ public class ScanService extends Service implements ServiceManager {
     }
 */
 
-
+/*
     private void updateProgressBar() {
         for (int i = (int) actual; i <= actual + 100 / tests.size() ; i++) {
             final int finalI = i;
@@ -119,18 +163,21 @@ public class ScanService extends Service implements ServiceManager {
         }
         actual += 100 / tests.size();
     }
+    */
 
+    /*
     private void setListView() {
         ArrayAdapter<TestManager> adapter = new MyListAdapter();
         ListView list = (ListView) bContext.findViewById(R.id.testListView);
         list.setAdapter(adapter);
     }
+    */
 
     @Override
     public Map getResults() {
         return results;
     }
-
+/*
     private class MyListAdapter extends ArrayAdapter<TestManager> {
         public MyListAdapter() {
             super(bContext, R.layout.item_view, tests);
@@ -181,4 +228,5 @@ public class ScanService extends Service implements ServiceManager {
             }
         });
     }
+    */
 }

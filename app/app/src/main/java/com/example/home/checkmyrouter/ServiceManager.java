@@ -11,9 +11,9 @@ import java.util.Map;
  */
 public interface ServiceManager {
     /**
-     * Method to run given service
+     * Method to run given test
      */
-    public void run();
+    public void run(TestManager test, int index);
 
     /**
      * Method to collect results from our service
@@ -21,6 +21,4 @@ public interface ServiceManager {
      * @return true if all s ervice passed, false if not
      */
     public Map getResults();
-
-    public void setbContext(BindingActivity context);
 }

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.format.Formatter;
 import android.util.Log;
 
@@ -12,15 +14,21 @@ import java.util.List;
 /**
  * Created by Home on 23.03.2016.
  */
-public class TestEncryption implements TestManager {
+public class TestEncryption implements TestManager, Parcelable {
+    public static ScanService sContext;
     private boolean testPassed = false;
-    public static ScanService sContext = null;
-    public static BindingActivity bContext = null;
+    private static final String NAME = "Encryption test";
 
+    public TestEncryption() {
+    }
+
+    public TestEncryption(boolean testPassed) {
+        this.testPassed = testPassed;
+    }
 
     @Override
     public String testName() {
-        return "Encryption test";
+        return NAME;
     }
 
     @Override
@@ -63,4 +71,32 @@ public class TestEncryption implements TestManager {
         Log.w("GET ROUTER IP", result);
         return result.equals("0.0.0.0") ? "192.168.1.1" : result;
     }
+
+
+    protected TestEncryption(Parcel in) {
+        testPassed = in.readByte() != 0x00;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (testPassed ? 0x01 : 0x00));
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TestEncryption> CREATOR = new Parcelable.Creator<TestEncryption>() {
+        @Override
+        public TestEncryption createFromParcel(Parcel in) {
+            return new TestEncryption(in);
+        }
+
+        @Override
+        public TestEncryption[] newArray(int size) {
+            return new TestEncryption[size];
+        }
+    };
 }

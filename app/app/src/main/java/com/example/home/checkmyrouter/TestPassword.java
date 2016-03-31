@@ -8,6 +8,8 @@ import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.util.Base64;
@@ -27,21 +29,23 @@ import java.util.logging.LogRecord;
 /**
  * Created by Home on 23.03.2016.
  */
-public class TestPassword implements TestManager {
+public class TestPassword implements TestManager, Parcelable {
     private List<String> name;
     private List<String> pass;
 
-    Handler handler = new Handler();
-
     protected static ScanService sContext;
-    protected static BindingActivity bContext;
 
-    private boolean defaultTest = false;
-    private boolean testPassed = false;
+    private boolean defaultTest = true;
+    private boolean testPassed = true;
+
+    private static final String NAME = "Default password test";
+
+    public TestPassword() {
+    }
 
     @Override
     public String testName() {
-        return "Default password test";
+        return NAME;
     }
 
     @Override
@@ -69,9 +73,9 @@ public class TestPassword implements TestManager {
     @Override
     public String getSolution() {
         return "Launch web browser.\n" +
-               "Log into your device through router\n" +
-               "IP address " + getRouterIp() + ".\n" +
-               "Go to settings and set your password";
+                "Log into your device through router\n" +
+                "IP address " + getRouterIp() + ".\n" +
+                "Go to settings and set your password";
     }
 
     private String getRouterIp(){
@@ -93,7 +97,7 @@ public class TestPassword implements TestManager {
         pass = new ArrayList<>();
 
         AssetManager am = sContext.getAssets();
-        Log.w("getAssets", "✓");
+        Log.w("getAssets", "&#10003;");
         try (BufferedReader in = new BufferedReader(new InputStreamReader(am.open("credentials.txt")))){
             String line;
             while((line = in.readLine()) != null)
@@ -140,4 +144,57 @@ public class TestPassword implements TestManager {
         testPass.start();
         return testPassed();
     }
+
+    protected TestPassword(Parcel in) {
+        if (in.readByte() == 0x01) {
+            name = new ArrayList<String>();
+            in.readList(name, String.class.getClassLoader());
+        } else {
+            name = null;
+        }
+        if (in.readByte() == 0x01) {
+            pass = new ArrayList<String>();
+            in.readList(pass, String.class.getClassLoader());
+        } else {
+            pass = null;
+        }
+        defaultTest = in.readByte() != 0x00;
+        testPassed = in.readByte() != 0x00;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (name == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(name);
+        }
+        if (pass == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(pass);
+        }
+        dest.writeByte((byte) (defaultTest ? 0x01 : 0x00));
+        dest.writeByte((byte) (testPassed ? 0x01 : 0x00));
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TestPassword> CREATOR = new Parcelable.Creator<TestPassword>() {
+        @Override
+        public TestPassword createFromParcel(Parcel in) {
+            return new TestPassword(in);
+        }
+
+        @Override
+        public TestPassword[] newArray(int size) {
+            return new TestPassword[size];
+        }
+    };
 }
