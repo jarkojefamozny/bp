@@ -1,6 +1,7 @@
 package com.example.home.checkmyrouter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -17,7 +18,10 @@ import java.util.List;
 public class TestEncryption implements TestManager, Parcelable {
     public static ScanService sContext;
     private boolean testPassed = false;
+    public static final String BROADCAST_ENCRYPTION_TEST = "encr";
+    private volatile boolean amIFinished = false;
     private static final String NAME = "Encryption test";
+    Intent intent;
 
     public TestEncryption() {
     }
@@ -33,6 +37,7 @@ public class TestEncryption implements TestManager, Parcelable {
 
     @Override
     public void test() {
+        Log.w("ENCRYPT", "testing encryption");
         List<ScanResult> networkList = ((WifiManager) sContext.getSystemService(Context.WIFI_SERVICE)).getScanResults();
 
         for (ScanResult network : networkList)
@@ -47,6 +52,12 @@ public class TestEncryption implements TestManager, Parcelable {
                 testPassed = false;
             }
         }
+
+        intent = new Intent(BROADCAST_ENCRYPTION_TEST);
+        intent.putExtra("pass", testPassed);
+        sContext.sendBroadcast(intent);
+        Log.w("ENRYPT", "I am finished");
+        Log.w("ENRYPT", "Result: " + testPassed);
     }
 
     @Override

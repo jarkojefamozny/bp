@@ -1,5 +1,6 @@
 package com.example.home.checkmyrouter;
 
+import android.content.IntentFilter;
 import android.os.Parcelable;
 
 /**
@@ -7,7 +8,8 @@ import android.os.Parcelable;
  *
  * @author Jaroslav Bonco &lt;https://github.com/jarkojefamozny
  */
-public interface TestManager {
+public interface TestManager  {
+
     /**
      * Method to get name of given test
      *

@@ -2,6 +2,7 @@ package com.example.home.checkmyrouter;
 
 import android.content.ServiceConnection;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,7 +14,7 @@ public interface ServiceManager {
     /**
      * Method to run given test
      */
-    public void run(TestManager test, int index);
+    public void run();
 
     /**
      * Method to collect results from our service
@@ -21,4 +22,6 @@ public interface ServiceManager {
      * @return true if all s ervice passed, false if not
      */
     public Map getResults();
+
+    public void getSources(List<TestManager> tests);
 }

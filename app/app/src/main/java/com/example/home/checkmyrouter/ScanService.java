@@ -1,25 +1,16 @@
 package com.example.home.checkmyrouter;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.media.Image;
+import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import junit.framework.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,52 +27,70 @@ public class ScanService extends Service implements ServiceManager {
     Intent intent;
 
     TestManager test;
-    int index;
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
     private Map<TestManager, Boolean> results = new HashMap<>();
+    private List<TestManager> tests = new ArrayList<>();
 
     private double actual = 0;
 
     @Override
     public void onCreate() {
+        Log.w("SERVICA", "onCreate");
         super.onCreate();
 
-        intent = new Intent(BROADCAST_ACTION);
+        handler.removeCallbacks(sendUpdatesToUI);
+        IntentFilter filter = new IntentFilter();
+        registerReceiver(receiver, new IntentFilter(TestPassword.BROADCAST_PASSWORD_TEST));
+        registerReceiver(receiver, new IntentFilter(TestEncryption.BROADCAST_ENCRYPTION_TEST));
+        registerReceiver(receiver, new IntentFilter(TestSpam.BROADCAST_SPAM_TEST));
     }
 
     @Override
-    public void run(TestManager test, int index) {
-        this.test = test;
-        this.index = index;
+    public void onDestroy() {
+        unregisterReceiver(receiver);
+    }
 
-        handler.removeCallbacks(sendUpdatesToUI);
+    public void getSources(List<TestManager> tests) {
+        for (TestManager test : tests) {
+            this.tests.add(test);
+        }
+    }
+
+    @Override
+    public void run() {
+        TestSpam.sContext = ScanService.this;
+        TestPassword.sContext = ScanService.this;
+        TestEncryption.sContext = ScanService.this;
+        for(final TestManager test : tests){
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    test.test();
+                }
+            };
+
+            Thread testPass = new Thread(r);
+            testPass.start();
+        }
     }
 
     private Runnable sendUpdatesToUI = new Runnable() {
         public void run() {
-            /*tests.add(new TestPassword());
-            tests.add(new TestEncryption());
-            tests.add(new TestPassword());
-            tests.add(new TestEncryption());*/
-
-
-            TestPassword.sContext = ScanService.this;
-            TestEncryption.sContext = ScanService.this;
-
-            test.test();
-                //results.put(test, test.testPassed());
-                DisplayLoggingInfo(test, index);
-            }
+            int index = tests.lastIndexOf(test);
+            DisplayLoggingInfo(test, index);
+        }
     };
 
     private void DisplayLoggingInfo(TestManager test, int index) {
+        intent = new Intent(BROADCAST_ACTION);
         Log.d("DATA", "entered DisplayLoggingInfo");
-
+        Log.w("PARCELUJEM", "Na indexe : " + String.valueOf(index));
         intent.putExtra("test", (Parcelable) test);
-        intent.putExtra("index", String.valueOf(index));
+        intent.putExtra("index", String.valueOf(tests.indexOf(test)));
         sendBroadcast(intent);
+        Log.d("BUNDLE", intent.toString());
     }
 
     public class LocalBinder extends Binder {
@@ -99,134 +108,47 @@ public class ScanService extends Service implements ServiceManager {
         return mBinder;
     }
 
-  /*  @Override
-    public void run() {
-        tests.add(new TestPassword());
-        tests.add(new TestEncryption());
-        tests.add(new TestPassword());
-        tests.add(new TestEncryption());
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(TestEncryption.BROADCAST_ENCRYPTION_TEST)){
+                Bundle bundle = intent.getExtras();
+                boolean result = bundle.getBoolean("pass");
+                Log.w("BROADCAST", "received ENC " + result);
+                test = getTest("Encryption test");
+                results.put(test, result);
+                sendUpdatesToUI.run();
+            } else if(action.equals(TestPassword.BROADCAST_PASSWORD_TEST)) {
+                Bundle bundle = intent.getExtras();
+                boolean result = bundle.getBoolean("pass");
+                Log.w("BROADCAST", "received PASS = " + result);
+                test = getTest("Default password test");
+                results.put(test, result);
+                sendUpdatesToUI.run();
+            } else if(action.equals(TestSpam.BROADCAST_SPAM_TEST)){
+                Bundle bundle = intent.getExtras();
+                boolean result = bundle.getBoolean("pass");
+                test = getTest("SPAM test");
+                results.put(test, result);
+                Log.w("BROADCAST", "received SPAM " + result);
+                sendUpdatesToUI.run();
+            }
+        }
+    };
 
-        setListView();
-        TestPassword.sContext = this;
-        TestEncryption.sContext = this;
-
-        int index = 0;
-        for (TestManager test : tests) {
-            test.test();
-            results.put(test, test.testPassed());
-            updateProgressBar();
-            //updateListView(index, results.get(test));
-            index++;
+    private TestManager getTest(String name){
+        for(TestManager test : tests){
+            if(test.testName().equals(name)){
+                return test;
+            }
         }
 
-
-        registerClickCallback();
+        return this.test;
     }
-    */
-/*
-    private void updateListView(int index, boolean passed) {
-        final ListView list = (ListView) bContext.findViewById(R.id.testListView);
-
-        View v = list.getChildAt(index);
-        Log.w("UPDATE", v.toString());
-        ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.item_testProgressBar);
-
-        Log.w("UPDATIKY", String.valueOf(passed));
-        if(passed){
-            ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
-            imageView.setImageResource(R.drawable.check);
-            progressBar.setVisibility(View.GONE);
-        } else {
-            ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
-            imageView.setImageResource(R.drawable.rejected);
-            progressBar.setVisibility(View.INVISIBLE);
-        }
-    }
-*/
-
-/*
-    private void updateProgressBar() {
-        for (int i = (int) actual; i <= actual + 100 / tests.size() ; i++) {
-            final int finalI = i;
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    bContext.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            bContext.percentage.setText(String.valueOf(finalI) + " %");
-                            bContext.progressBar.setProgress(finalI);
-                        }
-                    });
-                }
-            }, 20 * finalI);
-        }
-        actual += 100 / tests.size();
-    }
-    */
-
-    /*
-    private void setListView() {
-        ArrayAdapter<TestManager> adapter = new MyListAdapter();
-        ListView list = (ListView) bContext.findViewById(R.id.testListView);
-        list.setAdapter(adapter);
-    }
-    */
 
     @Override
     public Map getResults() {
         return results;
     }
-/*
-    private class MyListAdapter extends ArrayAdapter<TestManager> {
-        public MyListAdapter() {
-            super(bContext, R.layout.item_view, tests);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            View itemView = convertView;
-            if(itemView == null){
-                itemView = bContext.getLayoutInflater().inflate(R.layout.item_view, parent, false);
-            }
-
-            TestManager myTest = tests.get(position);
-
-            TextView textView = (TextView) itemView.findViewById(R.id.item_testName);
-            textView.setText(myTest.testName());
-
-            ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.item_testProgressBar);
-
-            if(results.get(myTest) == null){
-                progressBar.setVisibility(View.VISIBLE);
-            }
-            else if(results.get(myTest).booleanValue()){
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
-                imageView.setImageResource(R.drawable.check);
-                progressBar.setVisibility(View.INVISIBLE);
-            } else {
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
-                imageView.setImageResource(R.drawable.rejected);
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-            return itemView;
-        }
-    }
-
-    private void registerClickCallback(){
-        ListView list = (ListView) bContext.findViewById(R.id.testListView);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TestManager test = tests.get(position);
-
-                if(results.get(test).booleanValue()){
-                    Toast.makeText(bContext, "Test passed!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(bContext, test.getSolution(), Toast.LENGTH_LONG). show();
-                }
-            }
-        });
-    }
-    */
 }

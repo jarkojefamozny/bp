@@ -2,6 +2,7 @@ package com.example.home.checkmyrouter;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.DhcpInfo;
@@ -32,10 +33,12 @@ import java.util.logging.LogRecord;
 public class TestPassword implements TestManager, Parcelable {
     private List<String> name;
     private List<String> pass;
+    Intent intent;
 
     protected static ScanService sContext;
 
-    private boolean defaultTest = true;
+    private boolean haveItried = false;
+    public static final String BROADCAST_PASSWORD_TEST = "pass";
     private boolean testPassed = true;
 
     private static final String NAME = "Default password test";
@@ -50,20 +53,17 @@ public class TestPassword implements TestManager, Parcelable {
 
     @Override
     public void test() {
+        Log.w("PASS", "testing default");
         connectToRouter();
+        Log.w("PASSWORD", "I am finished");
+        intent = new Intent(BROADCAST_PASSWORD_TEST);
+        intent.putExtra("pass", String.valueOf(testPassed()));
+        sContext.sendBroadcast(intent);
     }
 
     @Override
     public boolean testPassed() {
         return testPassed;
-    }
-
-    public boolean isDefaultTest() {
-        return defaultTest;
-    }
-
-    public void setDefaultTest(boolean defaultTest) {
-        this.defaultTest = defaultTest;
     }
 
     public void setTestPassed(boolean testPassed) {
@@ -97,7 +97,7 @@ public class TestPassword implements TestManager, Parcelable {
         pass = new ArrayList<>();
 
         AssetManager am = sContext.getAssets();
-        Log.w("getAssets", "&#10003;");
+        //Log.w("getAssets", "&#10003;");
         try (BufferedReader in = new BufferedReader(new InputStreamReader(am.open("credentials.txt")))){
             String line;
             while((line = in.readLine()) != null)
@@ -116,32 +116,27 @@ public class TestPassword implements TestManager, Parcelable {
         this.getCredentials();
         final String url = "http://"+ getRouterIp();
 
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < name.size(); i++) {
-                    if(testPassed()){
-                        break;
-                    }
-                    try {
-                        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-
-                        c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
-                        if (c.getResponseMessage().equals("Unauthorized")) {
-                            c.disconnect();
-                        } else {
-                            setTestPassed(false);
-                            setDefaultTest(true);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+        for (int i = 0; i < name.size(); i++) {
+            if(haveItried){
+                break;
             }
-        };
+            try {
+                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
 
-        Thread testPass = new Thread(r);
-        testPass.start();
+                c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
+                if (c.getResponseMessage().equals("Unauthorized")) {
+                    c.disconnect();
+                    Log.w("PASS", String.valueOf(i) + ". try");
+                } else {
+                    Log.w("PASS", "TEST failed");
+                    setTestPassed(false);
+                    haveItried = true;
+                    //amIFinished = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return testPassed();
     }
 
@@ -158,7 +153,7 @@ public class TestPassword implements TestManager, Parcelable {
         } else {
             pass = null;
         }
-        defaultTest = in.readByte() != 0x00;
+        haveItried = in.readByte() != 0x00;
         testPassed = in.readByte() != 0x00;
     }
 
@@ -181,7 +176,7 @@ public class TestPassword implements TestManager, Parcelable {
             dest.writeByte((byte) (0x01));
             dest.writeList(pass);
         }
-        dest.writeByte((byte) (defaultTest ? 0x01 : 0x00));
+        dest.writeByte((byte) (haveItried ? 0x01 : 0x00));
         dest.writeByte((byte) (testPassed ? 0x01 : 0x00));
     }
 

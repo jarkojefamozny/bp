@@ -41,7 +41,7 @@ import java.util.Map;
 public class BindingActivity extends Activity {
     private ServiceManager mService;
     private boolean mBound = false;
-    private BroadcastReceiver receiver;
+    private BroadcastReceiver wifiReceiver;
     private IntentFilter intentFilter;
     private BindingActivity bContext = this;
 
@@ -66,7 +66,7 @@ public class BindingActivity extends Activity {
         percentage = (TextView) findViewById(R.id.textPercentage);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        receiver = new BroadcastReceiver() {
+        wifiReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -85,7 +85,8 @@ public class BindingActivity extends Activity {
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(receiver, intentFilter);
+        registerReceiver(wifiReceiver, intentFilter);
+        registerReceiver(broadcastReceiver, new IntentFilter(ScanService.BROADCAST_ACTION));
     }
 
     @Override
@@ -116,15 +117,15 @@ public class BindingActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(receiver, intentFilter);
+        registerReceiver(wifiReceiver, intentFilter);
         startService(intent);
         registerReceiver(broadcastReceiver, new IntentFilter(ScanService.BROADCAST_ACTION));
     }
 
     @Override
-    protected void onPause() {
+     protected void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
+        unregisterReceiver(wifiReceiver);
         unregisterReceiver(broadcastReceiver);
         stopService(intent);
     }
@@ -132,6 +133,7 @@ public class BindingActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -161,17 +163,13 @@ public class BindingActivity extends Activity {
 
             tests.add(new TestPassword());
             tests.add(new TestEncryption());
-            tests.add(new TestPassword());
-            tests.add(new TestEncryption());
+            tests.add(new TestSpam());
 
             setListView();
 
-            int index = 0;
-            for(TestManager test : tests){
-                mService.run(test, index);
-                results.put(test, test.testPassed());
-                index++;
-            }
+            Log.w("Bactivity", "start of service");
+            mService.getSources(tests);
+            mService.run();
             mBound = true;
         }
 
@@ -181,7 +179,7 @@ public class BindingActivity extends Activity {
         }
     };
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             updateUI(intent);
@@ -189,23 +187,27 @@ public class BindingActivity extends Activity {
     };
 
     private void updateUI(Intent intent) {
-        Bundle data = getIntent().getExtras();
+        Bundle data = intent.getExtras();
         TestManager test = data.getParcelable("test");
         int index = Integer.parseInt(intent.getStringExtra("index"));
+        results.put(test, test.testPassed());
 
         final ListView list = (ListView) findViewById(R.id.testListView);
 
-        View v = list.getChildAt(index);
-        Log.w("UPDATE", v.toString());
+        View v = getViewByPosition(index, list);
         ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.item_testProgressBar);
 
         if(test.testPassed()){
+            Log.w("PRESIEL", "mal by som nastavit na fajku index " + String.valueOf(index));
             ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
             imageView.setImageResource(R.drawable.check);
+            imageView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
         } else {
+            Log.w("NEPRESIEL", "mal by som nastavit na krizik");
             ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
             imageView.setImageResource(R.drawable.rejected);
+            imageView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.INVISIBLE);
         }
 
@@ -213,8 +215,27 @@ public class BindingActivity extends Activity {
         registerClickCallback();
     }
 
+    public View getViewByPosition(int pos, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+            return listView.getAdapter().getView(pos, null, listView);
+        } else {
+            final int childIndex = pos - firstListItemPosition;
+            return listView.getChildAt(childIndex);
+        }
+    }
+
     private void updateProgressBar() {
-        for (int i = (int) actual; i <= actual + 100 / tests.size() ; i++) {
+        int end = 0;
+        if( 100 - actual < (100 / tests.size()) + tests.size() ) { // Let actual be 66 -> 100 - 66 < 33 + 3 (for reminder from division)
+            end = 100;
+        } else {
+            end = (int) (actual + 100 / tests.size());
+        }
+
+        for (int i = (int) actual; i <= end ; i++) {
             final int finalI = i;
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -222,6 +243,7 @@ public class BindingActivity extends Activity {
                     bContext.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            Log.w("progress", String.valueOf(finalI));
                             bContext.percentage.setText(String.valueOf(finalI) + " %");
                             bContext.progressBar.setProgress(finalI);
                         }
@@ -267,27 +289,27 @@ public class BindingActivity extends Activity {
                 progressBar.setVisibility(View.VISIBLE);
                 imageView.setVisibility(View.INVISIBLE);
             }
-            /*else if(results.get(myTest).booleanValue()){
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
-                imageView.setImageResource(R.drawable.check);
-                progressBar.setVisibility(View.INVISIBLE);
-            } else {
-                ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
-                imageView.setImageResource(R.drawable.rejected);
-                progressBar.setVisibility(View.INVISIBLE);
-            }*/
             return itemView;
         }
     }
 
     private void registerClickCallback(){
+
         ListView list = (ListView) bContext.findViewById(R.id.testListView);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TestManager test = tests.get(position);
 
-                if (results.get(test).booleanValue()) {
+                for (Map.Entry<TestManager, Boolean> wtest : results.entrySet())
+                {
+                    if(wtest.getKey().testName().equals(test.testName())){
+                        test = wtest.getKey();
+                    }
+                }
+                Log.w("RegisterClickCallback", test.toString());
+
+                if (test.testPassed()) {
                     Toast.makeText(bContext, "Test passed!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(bContext, test.getSolution(), Toast.LENGTH_LONG).show();
