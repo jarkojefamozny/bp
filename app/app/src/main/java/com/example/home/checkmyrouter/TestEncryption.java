@@ -95,7 +95,7 @@ public class TestEncryption implements TestManager, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte((byte) (testPassed ? 0x01 : 0x00));
+        dest.writeInt((byte) (testPassed ? 0x01 : 0x00));
     }
 
     @SuppressWarnings("unused")
