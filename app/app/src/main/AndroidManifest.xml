@@ -17,7 +17,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <!-- Splash screen -->
         <activity
-            android:name="com.example.home.checkmyrouter.MainActivity"
+            android:name="com.example.home.checkmyrouter.SplashScreen"
             android:label="CheckMyRouter"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Black.NoTitleBar" >
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.home.checkmyrouter.BindingActivity"
+            android:name=".MainActivity"
             android:label="CheckMyRouter" >
         </activity>
         <activity
@@ -36,7 +36,6 @@
             android:label="CheckMyRouter" >
         </activity>
         <service android:name="ScanService" />
-        <service android:name=".AService" />
     </application>
 
 </manifest>

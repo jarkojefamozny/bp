@@ -33,14 +33,15 @@
         android:id="@+id/textPercentage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/progressBar"
-        android:layout_alignEnd="@+id/imageLogo"
-        android:layout_marginBottom="80dp"
-        android:layout_marginRight="-10dp"
+        android:layout_marginBottom="75dp"
         android:fontFamily="Lato Medium"
         android:text="0 %"
         android:textColor="#999999"
-        android:textSize="50dp" />
+        android:textSize="50dp"
+        android:layout_alignBottom="@+id/progressBar"
+        android:layout_alignLeft="@+id/progressBar"
+        android:layout_alignStart="@+id/progressBar"
+        android:layout_marginLeft="50dp" />
 
     <ListView
         android:id="@+id/testListView"

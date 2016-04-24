@@ -1,15 +1,15 @@
 package com.example.home.checkmyrouter;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 /**
- * Created by Home on 26.03.2016.
+ * Class StateNoWifi manages state when no wifi is available
+ *
+ * @author Jaroslav Bonco &lt;https://github.com/jarkojefamozny
  */
 public class StateNoWifi extends Activity {
     @Override
@@ -19,7 +19,8 @@ public class StateNoWifi extends Activity {
     }
 
     public void onClick(View v) {
-        Intent i = new Intent(StateNoWifi.this, BindingActivity.class);
+        Log.w("BUTTON", "Clicked");
+        Intent i = new Intent(StateNoWifi.this, MainActivity.class);
         startActivity(i);
     }
 }

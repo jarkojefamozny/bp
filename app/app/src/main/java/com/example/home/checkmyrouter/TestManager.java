@@ -1,8 +1,5 @@
 package com.example.home.checkmyrouter;
 
-import android.content.IntentFilter;
-import android.os.Parcelable;
-
 /**
  * Interface for tests, like password, encryption, stack, ...
  *
@@ -16,11 +13,13 @@ public interface TestManager  {
      * @return name of the test
      */
     public String testName();
+
     /**
      * Method to test network by some interface implementing criteria.
-     * In this method private attribute will be set
+     *
+     * @param callback after finishing sends a callback to service that it is finished
      */
-    public void test();
+    void runTest(ITestCallback callback);
 
     /**
      * Method to check whether specific test passed or not.
@@ -36,4 +35,17 @@ public interface TestManager  {
      * @return solution to given problem scenario.
      */
     public String getSolution();
+
+    /**
+     * Interface for callbacks
+     */
+    interface ITestCallback {
+        /**
+         * Method to send result after end of test.
+         * @param result result
+         */
+        void onTestDone(boolean result);
+    }
+
+
 }

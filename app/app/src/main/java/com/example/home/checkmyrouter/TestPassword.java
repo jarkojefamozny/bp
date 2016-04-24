@@ -1,22 +1,12 @@
 package com.example.home.checkmyrouter;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,20 +15,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogRecord;
 
 /**
- * Created by Home on 23.03.2016.
+ * Class TestPassword testing default password
+ *
+ * @author Jaroslav Bonco &lt;https://github.com/jarkojefamozny
  */
-public class TestPassword implements TestManager, Parcelable {
+public class TestPassword implements TestManager {
     private List<String> name;
     private List<String> pass;
-    Intent intent;
-
     protected static ScanService sContext;
 
     private boolean haveItried = false;
-    public static final String BROADCAST_PASSWORD_TEST = "pass";
     private boolean testPassed = true;
 
     private static final String NAME = "Default password test";
@@ -49,16 +37,6 @@ public class TestPassword implements TestManager, Parcelable {
     @Override
     public String testName() {
         return NAME;
-    }
-
-    @Override
-    public void test() {
-        Log.w("PASS", "testing default");
-        connectToRouter();
-        Log.w("PASSWORD", "I am finished");
-        intent = new Intent(BROADCAST_PASSWORD_TEST);
-        intent.putExtra("pass", String.valueOf(testPassed()));
-        sContext.sendBroadcast(intent);
     }
 
     @Override
@@ -76,6 +54,14 @@ public class TestPassword implements TestManager, Parcelable {
                 "Log into your device through router\n" +
                 "IP address " + getRouterIp() + ".\n" +
                 "Go to settings and set your password";
+    }
+
+    @Override
+    public void runTest(ITestCallback callback) {
+        Log.w("PASS", "testing default");
+        connectToRouter();
+        Log.w("PASSWORD", "I am finished");
+        callback.onTestDone(testPassed);
     }
 
     private String getRouterIp(){
@@ -131,65 +117,11 @@ public class TestPassword implements TestManager, Parcelable {
                     Log.w("PASS", "TEST failed");
                     setTestPassed(false);
                     haveItried = true;
-                    //amIFinished = true;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return testPassed();
+        return testPassed;
     }
-
-    protected TestPassword(Parcel in) {
-        if (in.readByte() == 0x01) {
-            name = new ArrayList<String>();
-            in.readList(name, String.class.getClassLoader());
-        } else {
-            name = null;
-        }
-        if (in.readByte() == 0x01) {
-            pass = new ArrayList<String>();
-            in.readList(pass, String.class.getClassLoader());
-        } else {
-            pass = null;
-        }
-        haveItried = in.readByte() != 0x00;
-        testPassed = in.readByte() != 0x00;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (name == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(name);
-        }
-        if (pass == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(pass);
-        }
-        dest.writeByte((byte) (haveItried ? 0x01 : 0x00));
-        dest.writeByte((byte) (testPassed ? 0x01 : 0x00));
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TestPassword> CREATOR = new Parcelable.Creator<TestPassword>() {
-        @Override
-        public TestPassword createFromParcel(Parcel in) {
-            return new TestPassword(in);
-        }
-
-        @Override
-        public TestPassword[] newArray(int size) {
-            return new TestPassword[size];
-        }
-    };
 }
