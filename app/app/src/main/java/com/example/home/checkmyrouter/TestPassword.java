@@ -108,7 +108,6 @@ public class TestPassword implements TestManager {
             }
             try {
                 HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-
                 c.setRequestProperty("Authorization", getB64Auth(name.get(i), pass.get(i)));
                 if (c.getResponseMessage().equals("Unauthorized")) {
                     c.disconnect();

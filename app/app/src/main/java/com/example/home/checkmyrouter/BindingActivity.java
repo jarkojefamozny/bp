@@ -27,6 +27,7 @@ public abstract class BindingActivity extends Activity implements ServiceConnect
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.w("BIND", "START");
         super.onCreate(savedInstanceState);
 
         receiver = new BroadcastReceiver() {
@@ -59,9 +60,10 @@ public abstract class BindingActivity extends Activity implements ServiceConnect
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         registerReceiver(receiver, intentFilter);
+        Log.w("Binding", "Spustam servicu ONRESUME");
         Intent intent = new Intent(this, ScanService.class);
         bindService(intent, this, BIND_AUTO_CREATE);
     }
@@ -70,7 +72,6 @@ public abstract class BindingActivity extends Activity implements ServiceConnect
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        Log.w("BInding", "Spustam servicu");
         if(isWifiOn) {
             ServiceManager s = (ServiceManager) service;
             onServiceBound(s);

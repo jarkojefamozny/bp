@@ -36,14 +36,16 @@ public class ScanService extends Service implements ServiceManager {
 
     @Override
     public void onCreate() {
-        Log.w("SERVICA", "onCreate");
+        Log.w("SERVICA", "START");
         super.onCreate();
         TestManager pass = new TestPassword();
         TestManager encr = new TestEncryption();
+        TestManager ip = new TestIp();
         TestManager spam = new TestSpam();
         mTests = new ArrayList<>();
         mTests.add(pass);
         mTests.add(encr);
+        mTests.add(ip);
         mTests.add(spam);
     }
 
@@ -62,9 +64,11 @@ public class ScanService extends Service implements ServiceManager {
 
     @Override
     public void startTests(final ServiceCallback callback) {
+        Log.w("SERVICA", "STARTTESTS");
         TestSpam.sContext = ScanService.this;
         TestPassword.sContext = ScanService.this;
         TestEncryption.sContext = ScanService.this;
+        TestIp.sContext = ScanService.this;
 
         for(final TestManager test : mTests){
             new Thread(new Runnable() {

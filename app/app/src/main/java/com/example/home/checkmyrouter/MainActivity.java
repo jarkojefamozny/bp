@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -41,19 +42,22 @@ public class MainActivity extends BindingActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        Log.w("MAIN", "START");
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scanning_phase);
 
-        Log.w("MAIN", "LAYOUT");
+
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         percentage = (TextView) findViewById(R.id.textPercentage);
 
         tests.add(new TestPassword());
         tests.add(new TestEncryption());
+        tests.add(new TestIp());
         tests.add(new TestSpam());
         setListView();
+        Log.w("MAIN", "LAYOUT");
     }
 
     @Override
@@ -72,16 +76,17 @@ public class MainActivity extends BindingActivity {
     }
 
     @Override
-    public void onTestDone(final String serviceName, final boolean result) {
+    public void onTestDone(final String testName, final boolean result) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                updateUI(serviceName, result);
+                updateUI(testName, result);
             }
         });
     }
 
     private void updateUI(String testName, boolean result) {
+        Log.w("UPDATE", testName + " result = " + String.valueOf(result));
         int index = 0;
         switch(testName){
             case "Default password test": results.put(new TestPassword(), result);
@@ -90,8 +95,11 @@ public class MainActivity extends BindingActivity {
             case "Encryption test": results.put(new TestEncryption(), result);
                 index = 1;
                 break;
-            case "SPAM test": results.put(new TestSpam(), result);
+            case "Default IP test": results.put(new TestIp(), result);
                 index = 2;
+                break;
+            case "SPAM test": results.put(new TestSpam(), result);
+                index = 3;
                 break;
         }
 
@@ -170,27 +178,37 @@ public class MainActivity extends BindingActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent){
-            View itemView = convertView;
-            if(itemView == null){
-                itemView = bContext.getLayoutInflater().inflate(R.layout.item_view, parent, false);
+            ViewHolder holder;
+            TestManager myTest = tests.get(position);
+
+            if(convertView == null){
+                convertView = bContext.getLayoutInflater().inflate(R.layout.item_view, parent, false);
+
+                holder = new ViewHolder();
+                holder.tv = (TextView) convertView.findViewById(R.id.item_testName);
+                holder.pb = (ProgressBar) convertView.findViewById(R.id.item_testProgressBar);
+                holder.iv = (ImageView) convertView.findViewById(R.id.item_icon);
+
+                holder.pb.setVisibility(View.VISIBLE);
+                holder.iv.setVisibility(View.INVISIBLE);
+                convertView.setTag(holder);
+            } else {
+                Log.w("ADAPTER", "OBNOVUJEM");
+                holder = (ViewHolder) convertView.getTag();
             }
+
+ //           itemView.setSelected(tests.contains(position));
 
             Log.w("ADAPTER", "TEST.LENGTH = " + tests.size());
             Log.w("ADAPTER", "POSITION = " + position);
 
-            TestManager myTest = tests.get(position);
+  //          TextView textView = (TextView) itemView.findViewById(R.id.item_testName);
+            holder.tv.setText(myTest.testName());
 
-            TextView textView = (TextView) itemView.findViewById(R.id.item_testName);
-            textView.setText(myTest.testName());
+ //           ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.item_testProgressBar);
+ //           ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
 
-            ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.item_testProgressBar);
-            ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
-
-            if(results.get(myTest) == null){
-                progressBar.setVisibility(View.VISIBLE);
-                imageView.setVisibility(View.INVISIBLE);
-            }
-            return itemView;
+            return convertView;
         }
     }
 
@@ -235,5 +253,12 @@ public class MainActivity extends BindingActivity {
                 }
             }
         });
+    }
+
+    static class ViewHolder
+    {
+        TextView tv;
+        ProgressBar pb;
+        ImageView iv;
     }
 }
