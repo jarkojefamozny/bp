@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,10 +29,11 @@ import java.util.Map;
  */
 public class MainActivity extends BindingActivity {
     private Map<TestManager, Boolean> results = new HashMap<>();
-    private List<TestManager> tests = new ArrayList<TestManager>();
+    protected static List<TestManager> tests;
 
     private double actual = 0;
 
+    TextView clickTest;
     ProgressBar progressBar;
     TextView percentage;
 
@@ -47,32 +49,19 @@ public class MainActivity extends BindingActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scanning_phase);
 
-
-
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         percentage = (TextView) findViewById(R.id.textPercentage);
+        clickTest = (TextView) findViewById(R.id.textClickTests);
 
+        clickTest.setVisibility(View.INVISIBLE);
+
+        tests = new ArrayList<TestManager>();
         tests.add(new TestPassword());
         tests.add(new TestEncryption());
         tests.add(new TestIp());
         tests.add(new TestSpam());
         setListView();
         Log.w("MAIN", "LAYOUT");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -107,20 +96,18 @@ public class MainActivity extends BindingActivity {
 
         View v = getViewByPosition(index, list);
         ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.item_testProgressBar);
+        ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
 
         if(result){
-            Log.w("PRESIEL", "mal by som nastavit na fajku index " + String.valueOf(index));
-            ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
+            Log.w("PRESIEL", "mal by som nastavit na fajku index " + v.toString());
             imageView.setImageResource(R.drawable.check);
-            imageView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
         } else {
             Log.w("NEPRESIEL", "mal by som nastavit na krizik");
-            ImageView imageView = (ImageView) v.findViewById(R.id.item_icon);
             imageView.setImageResource(R.drawable.rejected);
-            imageView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.INVISIBLE);
         }
+
+        imageView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
 
         updateProgressBar();
         registerClickCallback();
@@ -163,6 +150,10 @@ public class MainActivity extends BindingActivity {
             }, 20 * finalI);
         }
         actual += 100 / tests.size();
+
+        if(end == 100 ){
+            clickTest.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setListView() {
@@ -179,6 +170,8 @@ public class MainActivity extends BindingActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent){
             ViewHolder holder;
+            Log.w("TEST", String.valueOf(tests.size()));
+
             TestManager myTest = tests.get(position);
 
             if(convertView == null){
@@ -192,8 +185,9 @@ public class MainActivity extends BindingActivity {
                 holder.pb.setVisibility(View.VISIBLE);
                 holder.iv.setVisibility(View.INVISIBLE);
                 convertView.setTag(holder);
+                Log.w("ADAPTER", "Vytvaram " + tests.get(position).testName());
             } else {
-                Log.w("ADAPTER", "OBNOVUJEM");
+                Log.w("ADAPTER", "OBNOVUJEM " + tests.get(position).testName());
                 holder = (ViewHolder) convertView.getTag();
             }
 
@@ -201,15 +195,17 @@ public class MainActivity extends BindingActivity {
 
             Log.w("ADAPTER", "TEST.LENGTH = " + tests.size());
             Log.w("ADAPTER", "POSITION = " + position);
-
-  //          TextView textView = (TextView) itemView.findViewById(R.id.item_testName);
             holder.tv.setText(myTest.testName());
-
- //           ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.item_testProgressBar);
- //           ImageView imageView = (ImageView) itemView.findViewById(R.id.item_icon);
-
             return convertView;
         }
+    }
+
+
+    static class ViewHolder
+    {
+        TextView tv;
+        ProgressBar pb;
+        ImageView iv;
     }
 
     private void registerClickCallback(){
@@ -253,12 +249,5 @@ public class MainActivity extends BindingActivity {
                 }
             }
         });
-    }
-
-    static class ViewHolder
-    {
-        TextView tv;
-        ProgressBar pb;
-        ImageView iv;
     }
 }

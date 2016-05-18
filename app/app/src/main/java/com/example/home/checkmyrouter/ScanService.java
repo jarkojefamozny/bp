@@ -31,22 +31,13 @@ public class ScanService extends Service implements ServiceManager {
         }
     }
 
-    private ArrayList<TestManager> mTests;
+    private ArrayList<TestManager> tests = (ArrayList<TestManager>) MainActivity.tests;
     private Map<TestManager, Boolean> results = new HashMap<>();
 
     @Override
     public void onCreate() {
         Log.w("SERVICA", "START");
         super.onCreate();
-        TestManager pass = new TestPassword();
-        TestManager encr = new TestEncryption();
-        TestManager ip = new TestIp();
-        TestManager spam = new TestSpam();
-        mTests = new ArrayList<>();
-        mTests.add(pass);
-        mTests.add(encr);
-        mTests.add(ip);
-        mTests.add(spam);
     }
 
     public ScanService() {
@@ -65,12 +56,11 @@ public class ScanService extends Service implements ServiceManager {
     @Override
     public void startTests(final ServiceCallback callback) {
         Log.w("SERVICA", "STARTTESTS");
-        TestSpam.sContext = ScanService.this;
         TestPassword.sContext = ScanService.this;
         TestEncryption.sContext = ScanService.this;
         TestIp.sContext = ScanService.this;
 
-        for(final TestManager test : mTests){
+        for(final TestManager test : tests){
             new Thread(new Runnable() {
                 @Override
                 public void run() {

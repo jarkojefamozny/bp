@@ -8,7 +8,6 @@ import android.util.Log;
  * @author Jaroslav Bonco &lt;https://github.com/jarkojefamozny
  */
 public class TestSpam implements TestManager{
-    public static ScanService sContext;
     private boolean testPassed = false;
     private static final String NAME = "SPAM test";
 

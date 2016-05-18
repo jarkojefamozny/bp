@@ -113,6 +113,7 @@ public class TestPassword implements TestManager {
                     c.disconnect();
                     Log.w("PASS", String.valueOf(i) + ". try");
                 } else {
+                    Log.w("PASS", c.getResponseMessage());
                     Log.w("PASS", "TEST failed");
                     setTestPassed(false);
                     haveItried = true;

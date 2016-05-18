@@ -46,12 +46,24 @@
     <ListView
         android:id="@+id/testListView"
         android:layout_width="350dp"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/imageLogo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:background="#293544"
         android:fadeScrollbars="false"
         android:scrollbarSize = "10dip"
-        android:dividerHeight="3dp"/>
+        android:dividerHeight="3dp"
+        android:layout_above="@+id/textClickTests"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Click on each test!"
+        android:id="@+id/textClickTests"
+        android:layout_above="@+id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:textColor="#FFFF00" />
 </RelativeLayout>
