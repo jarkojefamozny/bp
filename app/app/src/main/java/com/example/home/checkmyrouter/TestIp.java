@@ -7,7 +7,9 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 /**
- * Created by Home on 05.05.2016.
+ * Class TestIp is testing Ip address
+ *
+ * @author Jaroslav Bonco &lt;https://github.com/jarkojefamozny
  */
 public class TestIp implements TestManager{
     public static ScanService sContext;

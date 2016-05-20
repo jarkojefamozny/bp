@@ -54,8 +54,7 @@
         android:fadeScrollbars="false"
         android:scrollbarSize = "10dip"
         android:dividerHeight="3dp"
-        android:layout_above="@+id/textClickTests"
-        />
+        android:layout_above="@+id/textClickTests" />
 
     <TextView
         android:layout_width="wrap_content"

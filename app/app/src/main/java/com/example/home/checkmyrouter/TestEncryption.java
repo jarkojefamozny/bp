@@ -46,15 +46,16 @@ public class TestEncryption implements TestManager {
     public void runTest(ITestCallback callback) {
         Log.w("ENCRYPT", "testing encryption");
         List<ScanResult> networkList = ((WifiManager) sContext.getSystemService(Context.WIFI_SERVICE)).getScanResults();
-
+        Log.w("ENRYPT", String.valueOf(networkList.size()));
         for (ScanResult network : networkList)
         {
-            String Capabilities = network.capabilities;
-            if(Capabilities.contains("WPA"))
+            String capabilities = network.capabilities;
+            Log.w("ENRYPT", capabilities.toString());
+            if(capabilities.contains("WPA"))
             {
                 testPassed = true;
             }
-            else if(Capabilities.contains("WEP"))
+            else if(capabilities.contains("WEP"))
             {
                 testPassed = false;
             }
